@@ -52,7 +52,7 @@ export default function SignUp() {
                 email,
                 password
             );
-            const update = await updateProfile(auth.currentUser, {
+            await updateProfile(auth.currentUser, {
                 displayName: username,
             });
  
