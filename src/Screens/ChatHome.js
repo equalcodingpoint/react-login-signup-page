@@ -9,7 +9,7 @@ import ListItemText from "@mui/material/ListItemText";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
 import { useNavigate } from "react-router";
- 
+
 import { db, auth } from "../Firebase";
 import {
     addDoc,
@@ -18,17 +18,17 @@ import {
     orderBy,
     query,
 } from "firebase/firestore";
- 
+
 function UsersComponent(props) {
     const handleToggle = (username, userId) => {
         props.setReceiverData({
             username: username,
             userId: userId,
         });
- 
+
         props.navigate(`/chat-home/${userId}`);
     };
- 
+
     return (
         <List
             dense
@@ -37,7 +37,7 @@ function UsersComponent(props) {
                 bgcolor: "background.paper"
             }}
         >
-            {props.users?.map((value, index) => {
+            {/* {props.users?.map((value, index) => {
                 const labelId = `checkbox-list-secondary-label-${value}`;
  
                 if (props.currentUserId !== value.userId)
@@ -59,31 +59,54 @@ function UsersComponent(props) {
                             </ListItemButton>
                         </ListItem>
                     );
+            })} */}
+            {props.users?.map((value, index) => {
+
+                return (
+                    <ListItem key={value.userId} disablePadding>
+                        <ListItemButton
+                            onClick={() => {
+                                handleToggle(value.username, value.userId);
+                            }}
+                        >
+                            <ListItemAvatar>
+                                <Avatar
+                                    alt={`${value.username}`}
+                                    src={`${value.username}.jpg`}
+                                />
+                            </ListItemAvatar>
+                            <ListItemText id={`checkbox-list-secondary-label-${value}`}
+                                primary={`${value.username}`} />
+                        </ListItemButton>
+                    </ListItem>
+                );
+
             })}
         </List>
     );
 }
- 
+
 export default function Home() {
     const [users, setUsers] = useState([]);
- 
+
     const [receiverData, setReceiverData] = useState(null);
     const [chatMessage, setChatMessage] = useState("");
- 
+
     const [allMessages, setAllMessages] = useState([]);
- 
+
     const user = auth.currentUser;
- 
+
     const navigate = useNavigate();
- 
+
     useEffect(() => {
         const unsub = onSnapshot(collection(db, "users"), (snapshot) => {
             setUsers(snapshot.docs.map((doc) => doc.data()));
         });
         return unsub;
     }, []);
- 
-    useEffect(() => {
+
+    useEffect(() => {;
+        console.log("receiverData===>",receiverData)
         if (receiverData) {
             const unsub = onSnapshot(
                 query(
@@ -109,12 +132,12 @@ export default function Home() {
             return unsub;
         }
     }, [receiverData?.userId]);
- 
+
     const sendMessage = async () => {
         try {
             if (user && receiverData) {
                 await addDoc(
-                    collection( 
+                    collection(
                         db,
                         "users",
                         user.uid,
@@ -129,7 +152,7 @@ export default function Home() {
                         timestamp: new Date(),
                     }
                 );
- 
+
                 await addDoc(
                     collection(
                         db,
@@ -152,7 +175,7 @@ export default function Home() {
         }
         setChatMessage("");
     };
- 
+
     return (
         <div style={root}>
             <Paper style={left}>
@@ -185,16 +208,16 @@ export default function Home() {
                     />
                 </div>
             </Paper>
- 
+
             <Paper style={right}>
                 <h4 style={{ margin: 2, padding: 10 }}>
                     {receiverData ? receiverData.username : user?.displayName}{" "}
                 </h4>
- 
+
                 <Divider />
                 <div style={messagesDiv}>
                     {/* messages area */}
- 
+
                     {allMessages &&
                         allMessages.map(({ id, messages }) => {
                             return (
@@ -231,7 +254,7 @@ export default function Home() {
                             );
                         })}
                 </div>
- 
+
                 <div style={{ width: "100%", display: "flex", flex: 0.08 }}>
                     <input
                         value={chatMessage}
@@ -248,14 +271,14 @@ export default function Home() {
         </div>
     );
 }
- 
+
 const root = {
     display: "flex",
     flexDirection: "row",
     flex: 1,
     width: "100%",
 };
- 
+
 const left = {
     display: "flex",
     flex: 0.2,
@@ -263,7 +286,7 @@ const left = {
     margin: 10,
     flexDirection: "column",
 };
- 
+
 const right = {
     display: "flex",
     flex: 0.8,
@@ -271,14 +294,14 @@ const right = {
     margin: 10,
     flexDirection: "column",
 };
- 
+
 const input = {
     flex: 1,
     outline: "none",
     borderRadius: 5,
     border: "none",
 };
- 
+
 const messagesDiv = {
     backgroundColor: "#FBEEE6",
     padding: 5,
