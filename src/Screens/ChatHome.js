@@ -131,7 +131,7 @@ export default function Home() {
             );
             return unsub;
         }
-    }, [receiverData?.userId]);
+    });
 
     const sendMessage = async () => {
         try {
